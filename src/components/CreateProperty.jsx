@@ -9,11 +9,14 @@ const CreateProperty = () => {
     description: '',
     price_per_day: '',
     location: '',
-    category:''
+    category:'',
+    images:[]
   });
+  const images = [];
   const categories =['Maison','Appartement','Véhicule'];
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const navigate = useNavigate();
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,13 +30,25 @@ const CreateProperty = () => {
     e.preventDefault();
     try {
         formData['owner_id'] = JSON.parse(localStorage.getItem('user')).id;
-      const response = await axios.post('/property', formData);
+        // Loop through the selected files and append them to the FormData object
+    for (let i = 0; i < selectedFiles.length; i++) {
+      images.push(selectedFiles[i]);
+    }
+    formData['images'] = images;
+      const response = await axios.post('/property', formData,
+      {headers: {
+        'Content-Type': 'multipart/form-data',
+      }});
       setSuccessMessage('Property created successfully!');
       setFormData({ title: '', description: '', price: '', location: '' }); // Reset form
       navigate('/properties');
     } catch (error) {
       setErrorMessage('An error occurred while creating the property.');
     }
+  };
+
+  const handleFileChange = (e) => {
+    setSelectedFiles(e.target.files);
   };
 
   return (
@@ -91,6 +106,15 @@ const CreateProperty = () => {
             value={formData.location} 
             onChange={handleChange} 
             required 
+          />
+        </div>
+        <div className="mb-3">
+          <label>Images:</label>
+          <input 
+          className="form-control"
+            type="file" 
+            multiple 
+            onChange={handleFileChange}
           />
         </div>
         <button type="submit">Create Property</button>
