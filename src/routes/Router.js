@@ -19,19 +19,22 @@ const PropertyDetails = lazy(() => import("../views/ui/PropertyDetails.js"));
 
 /*****Routes******/
 
-
+const HomeRedirect = () => {
+  const isAuthenticated = Boolean(localStorage.getItem('userToken'));
+  return isAuthenticated ? <Navigate to="/properties" /> : <Navigate to="/login" />;
+};
 
 const ThemeRoutes = [
   {
     path: "/",
-    element: <FullLayout />,
+    element:<FullLayout />,
     children: [
-      { path: "/", exact: true,element: <Navigate to="/properties" /> },
+      { path: "/", exact: true,element: <HomeRedirect /> },
       {path :"/login", exact : true, element : <Login/>},
       {path :"/register", exact : true, element : <Register/>},
       { path: "/properties", exact: true, element:<PrivateRoute element={<Properties />}/> },
       { path: "/myproperties", exact: true, element:<PrivateRoute element={<MyProperties />}/> },
-      { path: "/myproperties/new", exact: true, element: <NewPrperty /> },
+      { path: "/myproperties/new", exact: true, element:<PrivateRoute element={<NewPrperty />} /> },
       {path : "/myproperties/property/:id", exact: true,element: <PrivateRoute element={<Property />} />},
       {path : "/myreservations", exact: true,element: <PrivateRoute element={<MyReservations />} />},
       {path : "/myreservationsrequest", exact: true,element: <PrivateRoute element={<MyReservationsRequest />} />},
