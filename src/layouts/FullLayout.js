@@ -3,10 +3,16 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { Container } from "reactstrap";
 import { useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 const FullLayout = () => {
-  const noNavBarPaths = ['/login','/register'];
+  const noNavBarPaths = ['/login','/register','/'];
     const location = useLocation();
+    const userToken = localStorage.getItem("userToken");
+  const isAuthenticated = Boolean(userToken)
+  if (!isAuthenticated && !noNavBarPaths.includes(location.pathname)) {
+    return <Navigate to="/login" replace />;
+  }
   return (
     <main>
       {/********header**********/}
