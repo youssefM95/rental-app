@@ -88,7 +88,9 @@ const PropertyCard = ({property,showEditAndDelete,reload,edit}) => {
     const isStartDateBooked = startDate && isDateBooked(startDate, bookedDates);
     const isEndDateBooked = endDate && isDateBooked(endDate, bookedDates);
   const calculateTotalPrice = () => {
-    setTotalPrice(((endDate - startDate)/(1000*3600*24)) * property.price_per_day);
+    const sdate = new Date(startDate);
+    const edate = new Date(endDate);
+    setTotalPrice(((edate.setHours(0, 0, 0, 0) - sdate.setHours(0, 0, 0, 0))/(1000*3600*24)) * property.price_per_day);
   }
   const changeStartDate = (date) =>{
     setStartDate(date);
@@ -112,7 +114,8 @@ const PropertyCard = ({property,showEditAndDelete,reload,edit}) => {
       start_date: startDate.toISOString().split('T')[0],
       end_date: endDate.toISOString().split('T')[0],
       total_price: totalPrice,
-      status: 'pending'
+      status: 'pending',
+      is_payed: false
     };
     try {
     let response = await axios.post("/booking", formData);
@@ -194,7 +197,7 @@ const PropertyCard = ({property,showEditAndDelete,reload,edit}) => {
           <AccordionBody accordionId="2">
             <h4>Date début : {startDate ? startDate.toLocaleDateString() : ''}</h4>
             <h4>Date fin : {endDate ? endDate.toLocaleDateString() : ''}</h4>
-            <h4> Total : {totalPrice}$</h4>
+            <h4> Total : {totalPrice}  TND</h4>
           </AccordionBody>
         </AccordionItem>
       </Accordion>
@@ -242,7 +245,7 @@ const PropertyCard = ({property,showEditAndDelete,reload,edit}) => {
             </ListGroupItem>
             <ListGroupItem className="d-flex align-items-center p-3 border-0 justify-content-between">
             <Badge><i className="bi bi-cash"></i></Badge>
-                {property.price_per_day}€
+                {property.price_per_day} TND
             </ListGroupItem>
         </ListGroup>
         {

@@ -22,10 +22,13 @@ const Header = () => {
   
   
   const gotoMyProperties = ()=>{
-    navigate("/myproperties");
+    navigate("/profil/properties");
   };
   const gotoMyReservationsRequest= ()=>{
-    navigate("/myreservationsrequest");
+    navigate("/profil/reservations");
+  };
+  const gotoMyPaymentsRequest= ()=>{
+    navigate("/profil/payments");
   };
   const HandleLogout = async () => {
     let user = JSON.parse(localStorage.getItem('user'));
@@ -63,8 +66,9 @@ const Header = () => {
             ></img>
           </DropdownToggle>
           <DropdownMenu>
-            <DropdownItem onClick={gotoMyProperties}>My Properties</DropdownItem>
-            <DropdownItem onClick={gotoMyReservationsRequest}>My Reservations Request</DropdownItem>
+            <DropdownItem onClick={gotoMyProperties}>Properties</DropdownItem>
+            <DropdownItem onClick={gotoMyReservationsRequest}>Réservations</DropdownItem>
+            <DropdownItem onClick={gotoMyPaymentsRequest}>Paiements</DropdownItem>
             <DropdownItem onClick={HandleLogout}> Logout</DropdownItem>
           </DropdownMenu>
         </Dropdown>

@@ -16,6 +16,7 @@ import {
   ModalFooter,
   Alert
 } from "reactstrap";
+import { useStripe } from "@stripe/react-stripe-js";
 import axios from "../../api/axios";
 
 const BookingCard = ({booking,showConfirmAndRefuse,reload}) => {
@@ -26,6 +27,7 @@ const BookingCard = ({booking,showConfirmAndRefuse,reload}) => {
  const [visibleError, setVisibleError] = useState(false);
  const [errorMessage, setErrorMessage] = useState('');
  const toggleConfirmation = () => setConfirmOrRefuseOpen(false);
+ const stripe = useStripe();
  const openModalConfirmation = (text) => {
   setConfirmationBody(text);
   setConfirmOrRefuseOpen(true);
@@ -47,6 +49,52 @@ const BookingCard = ({booking,showConfirmAndRefuse,reload}) => {
     setVisibleError(true);
   }
  }
+ const checkout = async() => {
+  if (!stripe) {
+    console.error('Stripe has not loaded yet')
+    return
+    }
+    try {
+      const items = [{
+      price_data: {
+      currency: 'usd',
+      product_data: {
+      name: booking.property.title,
+      images: booking.property.images && booking.property.images.length? booking.property.images[0]: [],
+      },
+      unit_amount: Math.round(booking.total_price),
+      },
+      quantity: 1
+      }];
+      console.log('Sending to checkout:', items)
+      const response = await axios.post("payment/processpayment",JSON.stringify({
+        line_items: items,
+        success_url: `${window.location.origin}/payment/success/${booking.id}`,
+        cancel_url: `${window.location.origin}/myreservations`
+        }));
+
+      if (response.status != 200) {
+      const errorData = await response.data
+      throw new Error(errorData.error || 'Network response was not ok')
+      }
+      const data = await response.data;
+      console.log('Response from server:', data)
+      if (data.id) {
+      const result = await stripe.redirectToCheckout({
+      sessionId: data.id
+      })
+      if (result.error) {
+      console.error('Stripe redirect error:', result.error)
+      throw new Error(result.error.message)
+      }
+      } else {
+      throw new Error('No session ID received from server')
+      }
+      } catch (error) {
+      console.error('Checkout error:', error)
+      alert('Payment failed: ' + error.message)
+      }
+ }
  const statusColor = () => {
   switch(booking.status){
     case 'pending' : return "warning"; break;
@@ -55,7 +103,7 @@ const BookingCard = ({booking,showConfirmAndRefuse,reload}) => {
 }
  }
  useEffect(() => {
-  if (confirmOrRefuseOpen) {
+  if (!confirmOrRefuseOpen) {
     setErrorMessage('');
     setVisibleError(false);
     setConfirmed(false);
@@ -107,7 +155,7 @@ useEffect(()=> {
             </ListGroupItem>
             <ListGroupItem className="d-flex align-items-center p-3 border-0 justify-content-between">
             <Badge><i className="bi bi-cash"></i></Badge>
-                {booking.total_price}€
+                {booking.total_price} TND
             </ListGroupItem>
         </ListGroup>
         <Row>
@@ -126,6 +174,15 @@ useEffect(()=> {
               </Col>
               <Col>
               <Button color="danger" onClick={() =>openModalConfirmation("Réfuser")}>Réfuser</Button>
+              </Col>
+            </Row>
+          )
+        }
+        {
+          !showConfirmAndRefuse && booking.status == "confirmed" && !booking.is_payed && (
+            <Row xs="1 mt-3" className="d-flex offset-3">
+              <Col>
+              <Button color="primary" onClick={() =>checkout()}>check-out</Button>
               </Col>
             </Row>
           )

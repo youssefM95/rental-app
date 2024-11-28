@@ -12,6 +12,11 @@ const navigation = [
     title: "Réservations",
     href: "/myreservations",
     icon: "bi bi-card-text",
+  },
+  {
+    title: "Paiements",
+    href: "/payments",
+    icon: "bi bi-stripe",
   }
   
 ];

@@ -12,7 +12,7 @@ import {
   Alert
 } from "reactstrap";
 import  { useState } from 'react';
-import axios from "../../api/axios"; // You can use fetch if preferred
+import axios from "../../../api/axios"; // You can use fetch if preferred
 import { useNavigate } from 'react-router-dom';
 const NewProperty = () => {
   const categories =['Maison','Appartement','Véhicule'];

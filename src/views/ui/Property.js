@@ -123,7 +123,7 @@ const Property = () => {
       setSuccessMessage('Property created successfully!');
       setVisibleSuccess(true);
       setFormData({ title: '', description: '', price: '', location: '' }); // Reset form
-      setTimeout(() => {navigate('/myproperties');},2000)
+      setTimeout(() => {navigate('/profil/properties');},2000)
       
     } catch (error) {
       setErrorMessage('An error occurred while creating the property.');
